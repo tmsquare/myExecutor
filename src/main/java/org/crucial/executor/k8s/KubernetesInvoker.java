@@ -58,7 +58,7 @@ public class KubernetesInvoker {
                     .addNewContainer()
                     .withName(myName)
                     .withImage(image)
-                    //.withArgs("java","-classpath", libs, mainClass, command)
+                    .withArgs("java","-classpath", libs, mainClass, command)
                     //.withCommand("sh", "-c" , portScan)
                     //.withCommand("sh", "-c", getMyIP)
                     //.withCommand("sh", "-c", sendData)
@@ -80,11 +80,10 @@ public class KubernetesInvoker {
                     .waitUntilCondition(pod -> pod.getStatus().getPhase().equals("Succeeded"), 1, TimeUnit.MINUTES);
 
             // Print Job's log
-            //joblog = client.batch().v1().jobs().inNamespace(namespace).withName(myName).getLog();
             joblog = client.pods().inNamespace(namespace).withName(podList.getItems().get(0).getMetadata().getName()).getLog();
 
             // Delete job
-            //client.batch().v1().jobs().inNamespace(namespace).delete(job);
+            client.batch().v1().jobs().inNamespace(namespace).delete(job);
 
         } catch (KubernetesClientException e) {
             System.out.println("Unable to create job");
