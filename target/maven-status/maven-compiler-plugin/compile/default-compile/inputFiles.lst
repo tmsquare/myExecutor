@@ -4,6 +4,7 @@
 /Users/macbook/Desktop/IPParis/Research-Project/executor/src/main/java/org/crucial/executor/k8s/KubernetesHandler.java
 /Users/macbook/Desktop/IPParis/Research-Project/executor/src/main/java/org/crucial/executor/ThreadCall.java
 /Users/macbook/Desktop/IPParis/Research-Project/executor/src/main/java/org/crucial/executor/ByteMarshaller.java
+/Users/macbook/Desktop/IPParis/Research-Project/executor/src/main/java/org/crucial/executor/k8s/KubernetesService.java
 /Users/macbook/Desktop/IPParis/Research-Project/executor/src/main/java/org/crucial/executor/k8s/KubernetesExecutorService.java
 /Users/macbook/Desktop/IPParis/Research-Project/executor/src/main/java/org/crucial/executor/k8s/KubernetesInvoker.java
 /Users/macbook/Desktop/IPParis/Research-Project/executor/src/main/java/org/crucial/executor/CloudThread.java

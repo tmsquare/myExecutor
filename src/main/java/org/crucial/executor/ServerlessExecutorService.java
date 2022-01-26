@@ -16,6 +16,7 @@ public abstract class ServerlessExecutorService implements ExecutorService {
     private final String executorName = UUID.randomUUID().toString();
     private ExecutorService executorService;
     private boolean local = false;
+    private boolean listen = false;
     private boolean isShutdown = false;
     private List<Future<?>> submittedTasks = new LinkedList<>();
 
@@ -77,6 +78,22 @@ public abstract class ServerlessExecutorService implements ExecutorService {
     }
 
     public <T> Future<T> submit(Callable<T> task) {
+        if (task == null) throw new NullPointerException();
+        if (!(task instanceof Serializable))
+            throw new IllegalArgumentException("Tasks must be Serializable");
+        Callable<T> localCallable = () -> {
+            ThreadCall call = new ThreadCall("ServerlessExecutor-"
+                    + Thread.currentThread().getName());
+            call.setTarget(task);
+            return invoke(call);
+        };
+        Future<T> f = executorService.submit(localCallable);
+        submittedTasks.add(f);
+        return f;
+    }
+
+    public <T> Future<T> submitListener(Callable<T> task) {
+        this.listen = true;
         if (task == null) throw new NullPointerException();
         if (!(task instanceof Serializable))
             throw new IllegalArgumentException("Tasks must be Serializable");
@@ -231,6 +248,7 @@ public abstract class ServerlessExecutorService implements ExecutorService {
 
     protected abstract byte[] invokeExternal(byte[] threadCall) ;
 
+
     private byte[] invokeLocal(byte[] threadCall) {
         CloudThreadHandler handler = new CloudThreadHandler();
         return handler.handle(threadCall);
@@ -240,7 +258,13 @@ public abstract class ServerlessExecutorService implements ExecutorService {
         this.local = local;
     }
 
+    public boolean getListen() {
+        return this.listen;
+    }
+
     public abstract void closeInvoker();
+
+    public abstract void deleteAllJobs() ;
 
     /**
      * This is a static class and not an in-line lambda expression because it

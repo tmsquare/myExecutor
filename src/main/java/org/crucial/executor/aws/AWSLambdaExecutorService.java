@@ -60,4 +60,9 @@ public class AWSLambdaExecutorService extends ServerlessExecutorService {
     public void closeInvoker() {
         invoker.stop();
     }
+
+    @Override
+    public void deleteAllJobs () {
+
+    }
 }

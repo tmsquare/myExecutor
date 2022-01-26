@@ -12,21 +12,21 @@ import java.util.Optional;
 
 public class KubernetesService {
 
-    public static void start() {
+    public static void start(String name, String selectorKey, String selectorValue) {
         try (KubernetesClient client = new DefaultKubernetesClient()) {
             String namespace = Optional.ofNullable(client.getNamespace()).orElse("default");
 
             Service service = new ServiceBuilder()
                     .withNewMetadata()
-                    .withName("my-service")
+                    .withName(name)
                     .endMetadata()
                     .withNewSpec()
-                    .withSelector(Collections.singletonMap("app", "MyApp"))
+                    .withSelector(Collections.singletonMap(selectorKey, selectorValue))
                     .addNewPort()
                     .withName("test-port")
                     .withProtocol("TCP")
                     .withPort(8080)
-                    .withTargetPort(new IntOrString(8080))
+                    //.withTargetPort(new IntOrString(8080))
                     .endPort()
                     .withType("LoadBalancer")
                     .endSpec()
