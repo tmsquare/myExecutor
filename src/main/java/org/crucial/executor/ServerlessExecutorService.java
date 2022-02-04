@@ -16,9 +16,12 @@ public abstract class ServerlessExecutorService implements ExecutorService {
     private final String executorName = UUID.randomUUID().toString();
     private ExecutorService executorService;
     private boolean local = false;
-    private boolean listen = false;
     private boolean isShutdown = false;
     private List<Future<?>> submittedTasks = new LinkedList<>();
+
+    private boolean listen = false;
+    private int port = 0;
+    private String serviceName = null;
 
     public ServerlessExecutorService() {
         executorService = Executors.newCachedThreadPool();
@@ -92,8 +95,10 @@ public abstract class ServerlessExecutorService implements ExecutorService {
         return f;
     }
 
-    public <T> Future<T> submitListener(Callable<T> task) {
+    public <T> Future<T> submitListener(String name, int port, Callable<T> task) {
         this.listen = true;
+        this.port = port;
+        this.serviceName = name;
         if (task == null) throw new NullPointerException();
         if (!(task instanceof Serializable))
             throw new IllegalArgumentException("Tasks must be Serializable");
@@ -262,9 +267,19 @@ public abstract class ServerlessExecutorService implements ExecutorService {
         return this.listen;
     }
 
+    public int getport() {
+        return this.port;
+    }
+
+    public String  getServiceName() {
+        return this.serviceName;
+    }
+
     public abstract void closeInvoker();
 
     public abstract void deleteAllJobs() ;
+
+    public abstract Dictionary<String, String> getServiceSpecs(String serviceName) ;
 
     /**
      * This is a static class and not an in-line lambda expression because it

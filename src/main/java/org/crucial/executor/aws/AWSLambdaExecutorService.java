@@ -7,9 +7,7 @@ import software.amazon.awssdk.services.lambda.model.InvokeResponse;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Properties;
+import java.util.*;
 
 public class AWSLambdaExecutorService extends ServerlessExecutorService {
 
@@ -62,7 +60,8 @@ public class AWSLambdaExecutorService extends ServerlessExecutorService {
     }
 
     @Override
-    public void deleteAllJobs () {
+    public void deleteAllJobs () {}
 
-    }
+    @Override
+    public Dictionary<String, String> getServiceSpecs (String serviceName) { return null; }
 }

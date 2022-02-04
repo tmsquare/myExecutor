@@ -26,10 +26,9 @@ public class KubernetesInvoker {
         this.image = image;
     }
 
-    public String invoke(byte[] input, boolean listen) {
+    public String invoke(byte[] input, boolean listen, int port, String serviceName) {
 
         String joblog = null;
-        String serviceIP = null;
 
         String myName = jobName + "-" + Thread.currentThread().getName();
 
@@ -70,42 +69,29 @@ public class KubernetesInvoker {
             System.out.println("Creating job " + myName);
             client.batch().v1().jobs().inNamespace(namespace).createOrReplace(job);
 
-
-
             if (listen) {
                 // Create the service
-                String serviceName = "my-executor";
                 service = new KubernetesService();
-                service.start(serviceName, selectorKey, selectorValue);
-
-
-                // Wait until the External IP is ready
-                client.services().inNamespace(namespace).withName(serviceName).waitUntilCondition(serv ->  serv.getStatus().getLoadBalancer().getIngress().size() > 0 , 2, TimeUnit.MINUTES);
-
-                // Get the external IP
-                serviceIP = client.services().inNamespace(namespace).withName(serviceName)
-                        .get().getStatus().getLoadBalancer().getIngress().get(0).getIp();
-                return serviceIP;
-            }
-            else {
-                //Thread.sleep(3000);
-                // Get All pods created by the job
-                PodList podList = client.pods().inNamespace(namespace).withLabel("job-name", job.getMetadata().getName()).list();
-
-                // Wait for pod to complete
-                client.pods().inNamespace(namespace).withName(podList.getItems().get(0).getMetadata().getName())
-                        .waitUntilCondition(pod -> pod.getStatus().getPhase().equals("Succeeded"), 2, TimeUnit.MINUTES);
-
-                // Print Job's log
-                joblog = client.pods().inNamespace(namespace).withName(podList.getItems().get(0).getMetadata().getName()).getLog();
-
-                // Delete job
-                client.batch().v1().jobs().inNamespace(namespace).delete(job);
-
-                return joblog;
+                service.start(serviceName, selectorKey, selectorValue, port);
             }
 
-        } catch (KubernetesClientException e) {
+            Thread.sleep(1000);
+            // Get All pods created by the job
+            PodList podList = client.pods().inNamespace(namespace).withLabel("job-name", job.getMetadata().getName()).list();
+
+            // Wait for pod to complete
+            client.pods().inNamespace(namespace).withName(podList.getItems().get(0).getMetadata().getName())
+                    .waitUntilCondition(pod -> pod.getStatus().getPhase().equals("Succeeded"), 2, TimeUnit.MINUTES);
+
+            // Print Job's log
+            joblog = client.pods().inNamespace(namespace).withName(podList.getItems().get(0).getMetadata().getName()).getLog();
+
+            // Delete job
+            //client.batch().v1().jobs().inNamespace(namespace).delete(job);
+
+            return joblog;
+
+        } catch (KubernetesClientException | InterruptedException e) {
             System.out.println("Unable to create job");
         }
 

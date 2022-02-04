@@ -1,6 +1,5 @@
 package org.crucial.executor.k8s;
 
-import io.fabric8.kubernetes.api.model.IntOrString;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
@@ -12,7 +11,7 @@ import java.util.Optional;
 
 public class KubernetesService {
 
-    public static void start(String name, String selectorKey, String selectorValue) {
+    public static void start(String name, String selectorKey, String selectorValue, int port) {
         try (KubernetesClient client = new DefaultKubernetesClient()) {
             String namespace = Optional.ofNullable(client.getNamespace()).orElse("default");
 
@@ -25,7 +24,7 @@ public class KubernetesService {
                     .addNewPort()
                     .withName("test-port")
                     .withProtocol("TCP")
-                    .withPort(8080)
+                    .withPort(port)
                     //.withTargetPort(new IntOrString(8080))
                     .endPort()
                     .withType("LoadBalancer")
