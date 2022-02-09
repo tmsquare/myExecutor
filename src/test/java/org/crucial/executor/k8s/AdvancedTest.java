@@ -13,7 +13,6 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.stream.IntStream;
 
 public class AdvancedTest {
 
@@ -24,9 +23,12 @@ public class AdvancedTest {
         int port = 8080;
         String serviceName = "my-executor";
 
+
+
+        long start = System.currentTimeMillis();
         /*
              job-b
-             cmd: grep perl
+             cmd: grep data
         */
         ServerlessExecutorService esK8s1 = new KubernetesExecutorService("job-b", "tmsquare/executor-image");
         esK8s1.setLocal(false);
@@ -37,7 +39,7 @@ public class AdvancedTest {
                 System.out.println("Waiting for client on port " + serverSocket.getLocalPort() + "...");
 
                 List<String> data = new ArrayList<>();
-                String grep = "perl";
+                String grep = "Honda";
 
                 Socket clientSocket = serverSocket.accept();
                 Scanner in = new Scanner(clientSocket.getInputStream());
@@ -64,11 +66,12 @@ public class AdvancedTest {
 
         /*
              job-a
-             cmd: curl https://kubernetes.io/examples/controllers/job.yaml
+             cmd: curl URL
         */
         ServerlessExecutorService esK8s2 = new KubernetesExecutorService("job-a", "tmsquare/executor-image");
         esK8s2.setLocal(false);
         Future<String> future2 = esK8s2.submit((Serializable & Callable<String>) () -> {
+            String URL = "https://perso.telecom-paristech.fr/eagan/class/igr204/data/cars.csv";
                 try {
                     int serverPort = Integer.parseInt(serviceSpec.get("port"));
                     String host = serviceSpec.get("IP");
@@ -78,7 +81,7 @@ public class AdvancedTest {
 
                     PrintWriter toServer = new PrintWriter(socket.getOutputStream(), true);
 
-                    URL url = new URL("https://kubernetes.io/examples/controllers/job.yaml");
+                    URL url = new URL(URL);
                     Scanner sc = new Scanner(url.openStream());
                     while(sc.hasNextLine()) {
                         String line = sc.nextLine();
@@ -98,6 +101,11 @@ public class AdvancedTest {
 
         System.out.println(future2.get());
         System.out.println(future1.get());
+
+        long end = System.currentTimeMillis();
+        long elapsedTime = end - start;
+
+        System.out.println("Elapsed time: " + elapsedTime/1000.0);
 
         esK8s2.deleteAllJobs();
 

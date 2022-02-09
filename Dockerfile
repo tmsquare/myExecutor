@@ -10,9 +10,6 @@ RUN mvn -f /home/app/pom.xml clean package -DskipTests
 # Build stage
 #
 FROM openjdk:11-slim
-RUN apt-get update && \
-    apt-get install net-tools && \
-    apt-get install -y netcat
 COPY --from=build /home/app/target/executor-2.0.jar /usr/local/executor.jar
 COPY --from=build /home/app/target/executor-2.0-tests.jar /usr/local/executor-tests.jar
 COPY --from=build /home/app/target/lib/* /usr/local/lib

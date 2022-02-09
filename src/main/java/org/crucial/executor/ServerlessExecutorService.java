@@ -151,6 +151,15 @@ public abstract class ServerlessExecutorService implements ExecutorService {
         return executorService.invokeAll(localCallables);
     }
 
+    public <T> List<Future<T>> invokeAllListerner(String name, int port,Collection<? extends Callable<T>> tasks)
+            throws InterruptedException {
+        this.listen = true;
+        this.port = port;
+        this.serviceName = name;
+        List<Callable<T>> localCallables = generateCallables(tasks);
+        return executorService.invokeAll(localCallables);
+    }
+
     public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks,
                                          long timeout, TimeUnit unit)
             throws InterruptedException {

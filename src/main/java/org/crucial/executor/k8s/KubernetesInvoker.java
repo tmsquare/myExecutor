@@ -86,9 +86,6 @@ public class KubernetesInvoker {
             // Print Job's log
             joblog = client.pods().inNamespace(namespace).withName(podList.getItems().get(0).getMetadata().getName()).getLog();
 
-            // Delete job
-            //client.batch().v1().jobs().inNamespace(namespace).delete(job);
-
             return joblog;
 
         } catch (KubernetesClientException | InterruptedException e) {
