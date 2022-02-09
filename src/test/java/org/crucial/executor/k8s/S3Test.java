@@ -53,8 +53,8 @@ public class S3Test {
                 }
 
                 AWSCredentials credentials = new BasicAWSCredentials(
-                        "AKIAUSCEEJS5EVJHJ2PL",
-                        "hLMR5aXJ/MhSkC1fwLX90FhJ0GLx60sBEh/mXxMf"
+                        "access-key",
+                        "secret-key"
                 );
 
                 AmazonS3 s3client = AmazonS3ClientBuilder
