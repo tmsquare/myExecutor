@@ -7,6 +7,7 @@ COPY pom.xml /home/app
 RUN mvn -f /home/app/pom.xml clean package -DskipTests
 
 #
+#
 # Build stage
 #
 FROM openjdk:11-slim
